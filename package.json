@@ -12,13 +12,10 @@
   },
   "dependencies": {
     "basic-auth": "^2.0.1",
-    "cache-manager": "^3.4.3",
-    "cache-manager-fs-binary": "^1.0.4",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "request": "^2.88.2",
-    "sharp": "^0.28.1",
-    "spdy": "^4.0.2"
+    "sharp": "^0.28.1"
   },
   "engines": {
     "node": "15.14.0"

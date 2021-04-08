@@ -7,37 +7,40 @@ const proxy = require('./src/proxy')
 const spdy = require('spdy')
 const fs = require('fs')
 
-var options = {
-
-  // **optional** SPDY-specific options
-  spdy: {
-    protocols: [ 'h2', 'spdy/3.1', 'http/1.1' ],
-    // ssl doesn't make sense when we have ssl termination.
-    // key: fs.readFileSync(__dirname + '/keys/spdy-key.pem'),
-    // Fullchain file or cert file (prefer the former)
-    // cert: fs.readFileSync(__dirname + '/keys/spdy-fullchain.pem'),
-    ssl: false,
-    plain: true,
-
-    // **optional**
-    // Parse first incoming X_FORWARDED_FOR frame and put it to the
-    // headers of every request.
-    // NOTE: Use with care! This should not be used without some proxy that
-    // will *always* send X_FORWARDED_FOR
-    'x-forwarded-for': true,
-
-    connection: {
-      windowSize: 1024 * 1024, // Server's window size
-
-      // **optional** if true - server will send 3.1 frames on 3.0 *plain* spdy
-      autoSpdy31: true
-    }
-  }
-};
 const PORT = process.env.PORT || 8080
 
+// Turn on SSL if possible, but run http2c if not.
+// http2c makes if SSL is offloaded.
+const keyPath = './cert/privkey.pem';
+const certPath = './cert/fullchain.pem';
+let ssl = false;
+let plain = true;
+if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+    ssl = {
+        key: fs.readFileSync(keyPath),
+        cert: fs.readFileSync(certPath),
+    };
+    plain = false;
+}
+
+const options = {
+
+    // **optional** SPDY-specific options
+    spdy: {
+        protocols: ['h2', 'spdy/3.1', 'http/1.1'],
+        ssl: ssl,
+        plain: plain,
+        connection: {
+            windowSize: 1024 * 1024, // Server's window size
+            // **optional** if true - server will send 3.1 frames on 3.0 *plain* spdy
+            // helpful for best performance behind SSL offload.
+            autoSpdy31: true
+        }
+    }
+};
+
 app.enable('trust proxy')
-app.get('/', authenticate, params, proxy)
 app.get('/favicon.ico', (req, res) => res.status(204).end())
+app.get('/', authenticate, params, proxy)
 spdy.createServer(options, app).listen(PORT, () => console.log(`Listening on ${PORT}`))
 //app.listen(PORT, () => console.log(`Listening on ${PORT}`))

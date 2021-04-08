@@ -7,17 +7,37 @@ const proxy = require('./src/proxy')
 const spdy = require('spdy')
 const fs = require('fs')
 
-// ssl doesn't make sense when we have ssl termination.
-/*
-const ssl = {
-    key: fs.readFileSync('./cert/privkey.pem'),
-    cert: fs.readFileSync('./cert/fullchain.pem')
-}
-*/
-const ssl = false;
+var options = {
+
+  // **optional** SPDY-specific options
+  spdy: {
+    protocols: [ 'h2', 'spdy/3.1', 'http/1.1' ],
+    // ssl doesn't make sense when we have ssl termination.
+    // key: fs.readFileSync(__dirname + '/keys/spdy-key.pem'),
+    // Fullchain file or cert file (prefer the former)
+    // cert: fs.readFileSync(__dirname + '/keys/spdy-fullchain.pem'),
+    ssl: false,
+    plain: true,
+
+    // **optional**
+    // Parse first incoming X_FORWARDED_FOR frame and put it to the
+    // headers of every request.
+    // NOTE: Use with care! This should not be used without some proxy that
+    // will *always* send X_FORWARDED_FOR
+    'x-forwarded-for': true,
+
+    connection: {
+      windowSize: 1024 * 1024, // Server's window size
+
+      // **optional** if true - server will send 3.1 frames on 3.0 *plain* spdy
+      autoSpdy31: true
+    }
+  }
+};
 const PORT = process.env.PORT || 8080
 
 app.enable('trust proxy')
-app.get('/favicon.ico', (req, res) => res.status(204).end())
 app.get('/', authenticate, params, proxy)
-spdy.createServer(ssl, app).listen(PORT, () => console.log(`Listening on ${PORT}`))
+app.get('/favicon.ico', (req, res) => res.status(204).end())
+spdy.createServer(options, app).listen(PORT, () => console.log(`Listening on ${PORT}`))
+//app.listen(PORT, () => console.log(`Listening on ${PORT}`))

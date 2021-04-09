@@ -22,11 +22,11 @@ function proxy(req, res) {
             if (!origin.ok) {
                 return redirect(req, res);
             }
-            res.setHeader('content-encoding', 'identity');
             req.params.originType = origin.headers.get('content-type') || '';
             origin.buffer().then(buffer => {
                 req.params.originSize = buffer.length;
                 copyHeaders(origin, res);
+                res.setHeader('content-encoding', 'identity');
                 if (shouldCompress(req)) {
                     compress(req, res, buffer)
                 } else {

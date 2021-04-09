@@ -14,6 +14,7 @@
     "basic-auth": "^2.0.1",
     "cache-manager": "^3.4.3",
     "cache-manager-fs-binary": "^1.0.4",
+    "cluster": "^0.7.7",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",

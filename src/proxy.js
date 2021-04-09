@@ -23,7 +23,7 @@ function proxy(req, res) {
                 return redirect(req, res);
             }
             res.setHeader('content-encoding', 'identity');
-            req.params.originType = origin.headers['content-type'] || '';
+            req.params.originType = origin.headers.get('content-type') || '';
             origin.buffer().then(buffer => {
                 req.params.originSize = buffer.length;
                 copyHeaders(origin, res);

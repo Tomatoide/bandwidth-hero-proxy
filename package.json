@@ -16,7 +16,7 @@
     "cache-manager-fs-binary": "^1.0.4",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
-    "request": "^2.88.2",
+    "node-fetch": "^2.6.1",
     "sharp": "^0.28.1",
     "spdy": "^4.0.2"
   },

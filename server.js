@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 const cluster = require('cluster');
-const throng = require('throng');
 const WORKERS = process.env.WEB_CONCURRENCY || 1;
+
 
 if (cluster.isMaster) {
     console.log(`Master ${process.pid} is running`);
@@ -16,11 +16,6 @@ if (cluster.isMaster) {
         console.log(`worker ${worker.process.pid} died`);
         cluster.fork()
     });
-
-    throng({
-      workers: WORKERS,
-      lifetime: Infinity
-    }, start);
 } else {
     const PORT = process.env.PORT || 8080;
     const app = require('express')();
